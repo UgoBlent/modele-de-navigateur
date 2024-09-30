@@ -2,7 +2,7 @@
   "name": "browser-template",
   "version": "1.0.0",
   "license": "GPLV3",
-  "repository": "https://github.com/unilasalle-amiens/modele-de-navigateur",
+  "repository": "https://github.com/UgoBlent/modele-de-navigateur",
   "main": "main.js",
   "author": "UniLaSalle",
   "description": "Version développement d'un squelette de navigateur ",
