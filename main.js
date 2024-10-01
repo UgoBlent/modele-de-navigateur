@@ -40,6 +40,26 @@ app.whenReady().then(() => {
     }
   });
 
+  ipcMain.on('open-editor', () => {
+    if (!editorWindow) {
+      editorWindow = new BrowserWindow({
+        width: 600,
+        height: 400,
+        parent: mainWindow, // Fenêtre liée à la fenêtre principale
+        modal: true, // Fenêtre modale
+        webPreferences: {
+          preload: path.join(__dirname, 'preload.js'),
+          nodeIntegration: true,
+          contextIsolation: false
+        }
+      });
+      editorWindow.loadFile('editor.html'); // Charge la page HTML de l'éditeur
+      editorWindow.on('closed', () => {
+        editorWindow = null;
+      });
+    }
+  });
+
   ipcMain.on('go-back', () => {
     view.webContents.navigationHistory.goBack();
   });
@@ -86,5 +106,7 @@ app.whenReady().then(() => {
   view.webContents.on('did-navigate', () => {
     win.webContents.send('did-navigate');  // Send event to renderer process
   });
+
+  
 
 })

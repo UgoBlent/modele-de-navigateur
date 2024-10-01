@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Éditeur de code HTML/CSS</title>
+</head>
+<body>
+  <h1>Éditeur de code</h1>
+  <textarea id="code-editor" rows="10" cols="50">
+    <!-- Exemple : Modification du CSS ou du HTML -->
+    document.body.style.backgroundColor = 'lightblue';
+  </textarea>
+  <br>
+  <button id="apply-btn">Valider les modifications</button>
+
+  <script>
+    // Quand on clique sur "Valider", applique les changements dans la fenêtre principale
+    document.getElementById('apply-btn').addEventListener('click', () => {
+      const newCode = document.getElementById('code-editor').value;
+      window.applyChanges(newCode);  // Appelle la fonction pour appliquer le nouveau code
+    });
+  </script>
+</body>
+</html>

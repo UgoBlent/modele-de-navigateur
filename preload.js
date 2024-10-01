@@ -16,3 +16,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onDidNavigate: (callback) => ipcRenderer.on('did-navigate', callback)
 
 })
+
+// Fonction pour ouvrir la fenêtre d'édition
+window.openEditor = function() {
+  ipcRenderer.send('open-editor');
+};
+
+// Fonction pour appliquer les changements dans le processus de rendu
+window.applyChanges = function(newCode) {
+  ipcRenderer.send('apply-changes', newCode);
+};

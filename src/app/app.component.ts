@@ -7,11 +7,12 @@ import { ForwardComponent } from './forward/forward.component';
 import { RefreshComponent } from './refresh/refresh.component';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import { HomeComponent } from "./home/home.component";
+import { CodeEditComponent } from "./code-edit/code-edit.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, MatToolbarModule, AddressComponent, BackwardComponent, DebugComponent, ForwardComponent, RefreshComponent, HomeComponent],
+  imports: [RouterOutlet, MatToolbarModule, AddressComponent, BackwardComponent, DebugComponent, ForwardComponent, RefreshComponent, HomeComponent, CodeEditComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
