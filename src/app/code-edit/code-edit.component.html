@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Éditeur de texte</title>
+</head>
+<body>
+  <h1>Éditeur de code</h1>
+  <textarea id="code-editor" rows="10" cols="50">
+    document.body.style.backgroundColor = 'lightblue';
+  </textarea>
+  <br>
+  <button id="apply-btn">Appliquer les changements</button>
+
+  <script>
+    document.getElementById('apply-btn').addEventListener('click', () => {
+      const newCode = document.getElementById('code-editor').value;
+      window.applyChanges(newCode);  // Envoie le code au processus principal
+    });
+  </script>
+</body>
+</html>
