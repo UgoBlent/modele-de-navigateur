@@ -75,7 +75,13 @@ app.whenReady().then(() => {
     view.webContents.loadURL('https://amiens.unilasalle.fr');
   });
 
+
   win.on('resized', () => {
     fitViewToWin();
   });
+
+  view.webContents.on('did-start-navigation', (event, url) => {
+    win.webContents.send('update-url', url)
+  });
+
 })

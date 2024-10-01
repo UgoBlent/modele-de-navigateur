@@ -35,4 +35,5 @@ export class AddressComponent {
   goToPage(url: string) {
     this.browserService.goToPage(url);
   }
+
 }
