@@ -35,7 +35,7 @@ export class BrowserService {
       this.url = url;
         // Update the URL after the navigation is successful
     });
-    this.updateHistory();
+    this.waitForNavigation().then(() => this.updateHistory());
   }
 
   setToCurrentUrl(): void {
