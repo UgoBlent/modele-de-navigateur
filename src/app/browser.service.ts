@@ -18,28 +18,30 @@ export class BrowserService {
 
   goBack() {
     this.electronAPI.goBack();
-    this.updateHistory();
+    this.waitForNavigation().then(() => this.updateHistory());
   }
-
+  
   goForward() {
     this.electronAPI.goForward();
-    this.updateHistory();
+    this.waitForNavigation().then(() => this.updateHistory());
   }
 
   refresh() {
     this.electronAPI.refresh();
   }
 
-  goToPage(url: string) {
-    this.electronAPI.goToPage(url)
-      .then(() => this.updateHistory());
+  goToPage(url: string): void {
+    this.electronAPI.goToPage(url).then(() => {
+      this.url = url;
+        // Update the URL after the navigation is successful
+    });
+    this.updateHistory();
   }
 
-  setToCurrentUrl() {
-    this.electronAPI.currentUrl()
-      .then((url :string) => {
-        this.url = url;
-      });
+  setToCurrentUrl(): void {
+    this.electronAPI.currentUrl().then((currentUrl: string) => {
+      this.url = currentUrl;  // Set the URL to the current page's URL
+    });
   }
 
   updateHistory() {
@@ -50,5 +52,11 @@ export class BrowserService {
 
     this.electronAPI.canGoForward()
       .then((canGoForward : boolean) => this.canGoForward = canGoForward);
+  }
+
+  waitForNavigation(): Promise<void> {
+    return new Promise((resolve) => {
+      this.electronAPI.onDidNavigate(() => resolve());
+    });
   }
 }

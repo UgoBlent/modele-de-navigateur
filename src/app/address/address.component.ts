@@ -1,8 +1,8 @@
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild, OnInit } from '@angular/core';
 import { BrowserService } from '../browser.service';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
-import {MatInputModule} from '@angular/material/input';
+import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
@@ -12,10 +12,16 @@ import { MatButtonModule } from '@angular/material/button';
   templateUrl: './address.component.html',
   styleUrl: './address.component.css'
 })
-export class AddressComponent {
+export class AddressComponent implements OnInit {
   @ViewChild('search') searchElement: ElementRef = new ElementRef({});
-
   public browserService = inject(BrowserService);
+
+  ngOnInit(): void {
+    // Listen for URL updates from the Electron main process
+    this.browserService.electronAPI.onUrlUpdate((url: string) => {
+      this.browserService.url = url;  // Update the URL in BrowserService
+    });
+  }
 
   onKeyDownEvent(e: any) {
     if (e.key === 'Escape') {
@@ -30,10 +36,9 @@ export class AddressComponent {
 
   onMouseDown(e: any) {
     this.searchElement.nativeElement.select();
-  };
+  }
 
   goToPage(url: string) {
     this.browserService.goToPage(url);
   }
-
 }

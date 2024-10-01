@@ -83,5 +83,8 @@ app.whenReady().then(() => {
   view.webContents.on('did-start-navigation', (event, url) => {
     win.webContents.send('update-url', url)
   });
+  view.webContents.on('did-navigate', () => {
+    win.webContents.send('did-navigate');  // Send event to renderer process
+  });
 
 })
