@@ -1,25 +1,32 @@
-const { contextBridge, ipcRenderer } = require('electron/renderer')
+const { contextBridge, ipcRenderer } = require('electron/renderer');
 
-contextBridge.exposeInMainWorld('electronAPI', {
+// Exposer les fonctions via `window.electronAPI`
+window.electronAPI = {
   toogleDevTool: () => ipcRenderer.send('toogle-dev-tool'),
   goBack: () => ipcRenderer.send('go-back'),
   goForward: () => ipcRenderer.send('go-forward'),
   refresh: () => ipcRenderer.send('refresh'),
-
+  
   canGoForward: () => ipcRenderer.invoke('can-go-forward'),
   canGoBack: () => ipcRenderer.invoke('can-go-back'),
   goToPage: (url) => ipcRenderer.invoke('go-to-page', url),
   currentUrl: () => ipcRenderer.invoke('current-url'),
 
-  //listen to the 'update url' event
+  openEditor: () => ipcRenderer.send('open-editor'),  // Expose la méthode openEditor
+
+  // Écoute les événements de navigation
   onUrlUpdate: (callback) => ipcRenderer.on('update-url', (event, url) => callback(url)),
   onDidNavigate: (callback) => ipcRenderer.on('did-navigate', callback)
+};
 
-})
+ipcRenderer.on('load-page-source', (event, pageSource) => {
+  // Créer un événement personnalisé dans la fenêtre d'édition pour charger le code source
+  const eventLoad = new CustomEvent('load-page-source', { detail: pageSource });
+  window.dispatchEvent(eventLoad);
+});
 
-// Fonction pour ouvrir la fenêtre d'édition
-window.openEditor = function() {
-  ipcRenderer.send('open-editor');
+window.openEditor = {
+  openEditor: () => ipcRenderer.send('open-editor')
 };
 
 // Fonction pour appliquer les changements dans le processus de rendu

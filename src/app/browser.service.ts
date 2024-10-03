@@ -44,6 +44,14 @@ export class BrowserService {
     });
   }
 
+  openEditor(): void {
+    if (window && this.electronAPI) {
+      this.electronAPI.openEditor();
+    } else {
+      console.error('Electron API non disponible');
+    }
+  }
+
   updateHistory() {
     this.setToCurrentUrl();
 

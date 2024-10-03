@@ -1,14 +1,18 @@
 const { app, WebContentsView, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
 
+let editorWindow = null;
+
 app.whenReady().then(() => {
 
   // BrowserWindow initiate the rendering of the angular toolbar
   const win = new BrowserWindow({
-    width: 800,
+    width: 940,
     height: 800,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false
     }
   });
 
@@ -40,25 +44,35 @@ app.whenReady().then(() => {
     }
   });
 
-  ipcMain.on('open-editor', () => {
+  ipcMain.on('open-editor', async () => {
     if (!editorWindow) {
       editorWindow = new BrowserWindow({
         width: 600,
         height: 400,
-        parent: mainWindow, // Fenêtre liée à la fenêtre principale
-        modal: true, // Fenêtre modale
+        parent: win,  // Si tu veux garder la relation parent, sinon tu peux aussi l'enlever
         webPreferences: {
           preload: path.join(__dirname, 'preload.js'),
           nodeIntegration: true,
           contextIsolation: false
         }
       });
-      editorWindow.loadFile('editor.html'); // Charge la page HTML de l'éditeur
+  
+      editorWindow.loadFile('editor.html');
+      
+      // Récupérer le code source de la fenêtre principale
+      const pageSource = await view.webContents.executeJavaScript('document.documentElement.outerHTML');
+  
+      // Envoyer le code source après que la fenêtre d'édition soit complètement chargée
+      editorWindow.webContents.on('did-finish-load', () => {
+        editorWindow.webContents.send('load-page-source', pageSource);
+      });
+  
       editorWindow.on('closed', () => {
         editorWindow = null;
       });
     }
   });
+  
 
   ipcMain.on('go-back', () => {
     view.webContents.navigationHistory.goBack();
@@ -89,6 +103,28 @@ app.whenReady().then(() => {
     return view.webContents.getURL();
   });
 
+  ipcMain.on('apply-changes', (event, newCode) => {
+    // Utiliser document.open(), document.write() et document.close() pour injecter le nouveau code
+    const sanitizedCode = newCode.replace(/`/g, '\\`');  // Échapper les backticks si nécessaire
+    const script = `
+      document.open();
+      document.write(\`${sanitizedCode}\`);
+      document.close();
+    `;
+    view.webContents.executeJavaScript(script)
+      .then(() => {
+        console.log('Le code HTML a été appliqué avec succès via document.write');
+      })
+      .catch((error) => {
+        console.error('Erreur lors de l\'application du code HTML : ', error);
+      });
+  });
+
+  ipcMain.handle('get-page-source', async () => {
+    const pageSource = await view.webContents.executeJavaScript('document.documentElement.outerHTML');
+    return pageSource;
+  });
+
   //Register events handling from the main windows
   win.once('ready-to-show', () => {
     fitViewToWin();
@@ -106,7 +142,5 @@ app.whenReady().then(() => {
   view.webContents.on('did-navigate', () => {
     win.webContents.send('did-navigate');  // Send event to renderer process
   });
-
-  
 
 })

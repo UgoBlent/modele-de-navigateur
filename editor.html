@@ -3,22 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Éditeur de code HTML/CSS</title>
+  <title>Editor</title>
 </head>
 <body>
-  <h1>Éditeur de code</h1>
-  <textarea id="code-editor" rows="10" cols="50">
-    <!-- Exemple : Modification du CSS ou du HTML -->
-    document.body.style.backgroundColor = 'lightblue';
-  </textarea>
-  <br>
-  <button id="apply-btn">Valider les modifications</button>
+  <h1>Code Editor</h1>
+  <textarea id="code-area" style="width: 100%; height: 80%"></textarea>
+  <button id="apply-btn">Apply Changes</button>
 
   <script>
-    // Quand on clique sur "Valider", applique les changements dans la fenêtre principale
-    document.getElementById('apply-btn').addEventListener('click', () => {
-      const newCode = document.getElementById('code-editor').value;
-      window.applyChanges(newCode);  // Appelle la fonction pour appliquer le nouveau code
+    const textarea = document.getElementById('code-area');
+    const applyBtn = document.getElementById('apply-btn');
+
+    // Écouter l'événement personnalisé pour recevoir et charger le code source dans la zone de texte
+    window.addEventListener('load-page-source', (event) => {
+      console.log('Code source reçu : ', event.detail);  // Ajoute un log pour voir si le code source est bien reçu
+      textarea.value = event.detail;  // Charger le code source dans la zone de texte
+    });
+
+    // Appliquer les changements lorsque le bouton est cliqué
+    applyBtn.addEventListener('click', () => {
+      const newCode = textarea.value;
+      console.log('Nouveau code à appliquer : ', newCode);  // Log du nouveau code
+      window.electronAPI.applyChanges(newCode);  // Envoie le code modifié à l'IPC
     });
   </script>
 </body>
