@@ -1,1 +1,4 @@
-<p>language-selector works!</p>
+<select [(ngModel)]="selectedLanguage" (change)="onLanguageChange(selectedLanguage)">
+    <option *ngFor="let lang of languages" [value]="lang">{{ lang.toUpperCase() }}</option>
+  </select>
+  

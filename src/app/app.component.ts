@@ -5,13 +5,14 @@ import { BackwardComponent } from './backward/backward.component';
 import { DebugComponent } from './debug/debug.component';
 import { ForwardComponent } from './forward/forward.component';
 import { RefreshComponent } from './refresh/refresh.component';
+import { LanguageSelectorComponent } from './language-selector/language-selector.component';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import { HomeComponent } from "./home/home.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, MatToolbarModule, AddressComponent, BackwardComponent, DebugComponent, ForwardComponent, RefreshComponent, HomeComponent],
+  imports: [RouterOutlet, MatToolbarModule, AddressComponent, BackwardComponent, DebugComponent, ForwardComponent, RefreshComponent, HomeComponent, LanguageSelectorComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

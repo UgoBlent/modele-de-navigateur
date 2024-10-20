@@ -1,9 +1,9 @@
-const { app, WebContentsView, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, BrowserView, ipcMain } = require('electron');
 const path = require('node:path');
 
 app.whenReady().then(() => {
 
-  // BrowserWindow initiate the rendering of the angular toolbar
+  // Create the main window
   const win = new BrowserWindow({
     width: 800,
     height: 800,
@@ -12,79 +12,104 @@ app.whenReady().then(() => {
     }
   });
 
-  if (app.isPackaged){
+  // Load the app or the localhost URL
+  if (app.isPackaged) {
     win.loadFile('dist/browser-template/browser/index.html');
-  }else{
-    win.loadURL('http://localhost:4200')
+  } else {
+    win.loadURL('http://localhost:4200');
   }
 
+  // Create a new BrowserView
+  const view = new BrowserView();
 
-  // WebContentsView initiate the rendering of a second view to browser the web
-  const view = new WebContentsView();
-  win.contentView.addChildView(view);
+  // Attach the BrowserView to the BrowserWindow
+  win.setBrowserView(view);
 
-  // Always fit the web rendering with the electron windows
-  function fitViewToWin() {
-    const winSize = win.webContents.getOwnerBrowserWindow().getBounds();
-    view.setBounds({ x: 0, y: 55, width: winSize.width, height: winSize.height });
-  }
+  // Adjust the BrowserView size and position to fit within the main window
+  const fitViewToWindow = () => {
+    const [winWidth, winHeight] = win.getSize();
+    view.setBounds({ x: 0, y: 55, width: winWidth, height: winHeight - 55 });
+  };
 
-    win.webContents.openDevTools({ mode: 'detach' });
+  // Call initially to set the size of the view
+  fitViewToWindow();
 
-  // Register events handling from the toolbar
+  // Adjust the BrowserView when the window is resized
+  win.on('resize', fitViewToWindow);
+
+  // Open DevTools for the main window
+  win.webContents.openDevTools({ mode: 'detach' });
+
+  // IPC to toggle dev tools for the view
   ipcMain.on('toogle-dev-tool', () => {
-    if (winContent.isDevToolsOpened()) {
-      win.webContents.closeDevTools();
+    if (view.webContents.isDevToolsOpened()) {
+      view.webContents.closeDevTools();
     } else {
-      win.webContents.openDevTools({ mode: 'detach' });
+      view.webContents.openDevTools({ mode: 'detach' });
     }
   });
 
+  // Handle browser navigation actions (back, forward, refresh)
   ipcMain.on('go-back', () => {
-    view.webContents.navigationHistory.goBack();
-  });
-
-  ipcMain.handle('can-go-back', () => {
-    return view.webContents.navigationHistory.canGoBack();
+    if (view.webContents.canGoBack()) view.webContents.goBack();
   });
 
   ipcMain.on('go-forward', () => {
-    view.webContents.navigationHistory.goForward();
-  });
-
-  ipcMain.handle('can-go-forward', () => {
-    return view.webContents.navigationHistory.canGoForward();
+    if (view.webContents.canGoForward()) view.webContents.goForward();
   });
 
   ipcMain.on('refresh', () => {
     view.webContents.reload();
   });
 
+  // IPC handlers for navigating to a specific URL
   ipcMain.handle('go-to-page', (event, url) => {
     return view.webContents.loadURL(url);
   });
-
 
   ipcMain.handle('current-url', () => {
     return view.webContents.getURL();
   });
 
-  //Register events handling from the main windows
-  win.once('ready-to-show', () => {
-    fitViewToWin();
-    view.webContents.loadURL('https://amiens.unilasalle.fr');
+  // IPC handlers for enabling/disabling navigation buttons
+  ipcMain.handle('can-go-back', () => {
+    return view.webContents.canGoBack();
+  });
+
+  ipcMain.handle('can-go-forward', () => {
+    return view.webContents.canGoForward();
   });
 
 
-  win.on('resized', () => {
-    fitViewToWin();
+
+  ipcMain.handle('set-language', async (event, language) => {
+    try {
+      view.webContents.executeJavaScript(`document.documentElement.lang = "${language}";`);
+      return { success: true, message: 'Language set successfully' };
+    } catch (error) {
+      console.error('Error setting language:', error);
+      return { success: false, error: error.message };
+    }
   });
 
+
+  ipcMain.handle('execute-javascript', async (event, script) => {
+    try {
+      const result = await view.webContents.executeJavaScript(script);
+      return result;
+    } catch (error) {
+      console.error('Error executing JavaScript:', error);
+      throw error;
+    }
+  });
+
+  // Handle navigation events
   view.webContents.on('did-start-navigation', (event, url) => {
-    win.webContents.send('update-url', url)
-  });
-  view.webContents.on('did-navigate', () => {
-    win.webContents.send('did-navigate');  // Send event to renderer process
+    win.webContents.send('update-url', url);
   });
 
-})
+  view.webContents.on('did-navigate', () => {
+    win.webContents.send('did-navigate');
+  });
+});
+

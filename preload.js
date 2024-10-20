@@ -1,4 +1,7 @@
-const { contextBridge, ipcRenderer } = require('electron/renderer')
+const { contextBridge, ipcRenderer } = require('electron/renderer');
+
+// Check if localStorage is available before using it
+const selectedLanguage = localStorage ? localStorage.getItem('selectedLanguage') : 'en';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   toogleDevTool: () => ipcRenderer.send('toogle-dev-tool'),
@@ -11,8 +14,26 @@ contextBridge.exposeInMainWorld('electronAPI', {
   goToPage: (url) => ipcRenderer.invoke('go-to-page', url),
   currentUrl: () => ipcRenderer.invoke('current-url'),
 
-  //listen to the 'update url' event
   onUrlUpdate: (callback) => ipcRenderer.on('update-url', (event, url) => callback(url)),
-  onDidNavigate: (callback) => ipcRenderer.on('did-navigate', callback)
+  onDidNavigate: (callback) => ipcRenderer.on('did-navigate', callback),
 
-})
+  executeJavaScript: (script) => ipcRenderer.invoke('execute-javascript', script),
+
+  setLanguage: (language) => {
+    localStorage.setItem('selectedLanguage', language);
+    return ipcRenderer.invoke('set-language', language)
+      .then((result) => {
+        console.log('Language set result:', result);
+        return result;
+      })
+      .catch((error) => {
+        console.error('Error setting language:', error);
+        throw error;
+      });
+  },
+  
+
+  getLanguage: () => {
+    return localStorage.getItem('selectedLanguage') || 'en';  // Default to 'en' if none is set
+  }
+});
