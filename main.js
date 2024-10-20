@@ -44,6 +44,10 @@ app.whenReady().then(() => {
     }
   });
 
+  ipcMain.on('go-home', () => {
+    mainWindow.webContents.loadURL('https://amiens.unilasalle.fr');  // Page d'accueil prédéfinie
+  });
+
   ipcMain.on('open-editor', async () => {
     if (!editorWindow) {
       editorWindow = new BrowserWindow({

@@ -16,6 +16,14 @@ export class BrowserService {
     this.electronAPI.toogleDevTool();
   }
 
+  goHome(): void {
+    if (this.electronAPI && this.electronAPI.goHome) {
+      this.electronAPI.goHome();
+    } else {
+      console.error('Electron API non disponible pour Home');
+    }
+  }
+
   goBack() {
     this.electronAPI.goBack();
     this.waitForNavigation().then(() => this.updateHistory());

@@ -6,6 +6,7 @@ window.electronAPI = {
   goBack: () => ipcRenderer.send('go-back'),
   goForward: () => ipcRenderer.send('go-forward'),
   refresh: () => ipcRenderer.send('refresh'),
+  goHome: () => ipcRenderer.send('go-home'),
   
   canGoForward: () => ipcRenderer.invoke('can-go-forward'),
   canGoBack: () => ipcRenderer.invoke('can-go-back'),
