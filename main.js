@@ -1,14 +1,18 @@
 const { app, BrowserWindow, BrowserView, ipcMain } = require('electron');
 const path = require('node:path');
 
+let editorWindow = null;
+
 app.whenReady().then(() => {
 
   // Create the main window
   const win = new BrowserWindow({
-    width: 800,
+    width: 940,
     height: 800,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false
     }
   });
 

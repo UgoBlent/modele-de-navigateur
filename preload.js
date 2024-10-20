@@ -3,12 +3,14 @@ const { contextBridge, ipcRenderer } = require('electron/renderer');
 // Check if localStorage is available before using it
 const selectedLanguage = localStorage ? localStorage.getItem('selectedLanguage') : 'en';
 
-contextBridge.exposeInMainWorld('electronAPI', {
+// Exposer les fonctions via `window.electronAPI`
+window.electronAPI = {
   toogleDevTool: () => ipcRenderer.send('toogle-dev-tool'),
   goBack: () => ipcRenderer.send('go-back'),
   goForward: () => ipcRenderer.send('go-forward'),
   refresh: () => ipcRenderer.send('refresh'),
-
+  goHome: () => ipcRenderer.send('go-home'),
+  
   canGoForward: () => ipcRenderer.invoke('can-go-forward'),
   canGoBack: () => ipcRenderer.invoke('can-go-back'),
   goToPage: (url) => ipcRenderer.invoke('go-to-page', url),

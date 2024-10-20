@@ -8,6 +8,7 @@ import { RefreshComponent } from './refresh/refresh.component';
 import { LanguageSelectorComponent } from './language-selector/language-selector.component';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import { HomeComponent } from "./home/home.component";
+import { CodeEditComponent } from "./code-edit/code-edit.component";
 
 @Component({
   selector: 'app-root',

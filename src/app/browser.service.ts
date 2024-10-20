@@ -147,6 +147,14 @@ export class BrowserService {
     this.electronAPI.toogleDevTool();
   }
 
+  goHome(): void {
+    if (this.electronAPI && this.electronAPI.goHome) {
+      this.electronAPI.goHome();
+    } else {
+      console.error('Electron API non disponible pour Home');
+    }
+  }
+
   goBack() {
     this.electronAPI.goBack();
     this.waitForNavigation().then(() => this.updateHistory());
@@ -182,6 +190,14 @@ export class BrowserService {
     this.electronAPI.currentUrl().then((currentUrl: string) => {
       this.url = currentUrl;  // Set the URL to the current page's URL
     });
+  }
+
+  openEditor(): void {
+    if (window && this.electronAPI) {
+      this.electronAPI.openEditor();
+    } else {
+      console.error('Electron API non disponible');
+    }
   }
 
   updateHistory() {

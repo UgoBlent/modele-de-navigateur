@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor</title>
+</head>
+<body>
+  <h1>Code Editor</h1>
+  <textarea id="code-area" style="width: 100%; height: 80%"></textarea>
+  <button id="apply-btn">Apply Changes</button>
+
+  <script>
+    const textarea = document.getElementById('code-area');
+    const applyBtn = document.getElementById('apply-btn');
+
+    // Écouter l'événement personnalisé pour recevoir et charger le code source dans la zone de texte
+    window.addEventListener('load-page-source', (event) => {
+      console.log('Code source reçu : ', event.detail);  // Ajoute un log pour voir si le code source est bien reçu
+      textarea.value = event.detail;  // Charger le code source dans la zone de texte
+    });
+
+    // Appliquer les changements lorsque le bouton est cliqué
+    applyBtn.addEventListener('click', () => {
+      const newCode = textarea.value;
+      console.log('Nouveau code à appliquer : ', newCode);  // Log du nouveau code
+      window.electronAPI.applyChanges(newCode);  // Envoie le code modifié à l'IPC
+    });
+  </script>
+</body>
+</html>
