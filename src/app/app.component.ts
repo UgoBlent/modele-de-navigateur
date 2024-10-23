@@ -13,7 +13,7 @@ import { CodeEditComponent } from "./code-edit/code-edit.component";
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, MatToolbarModule, AddressComponent, BackwardComponent, DebugComponent, ForwardComponent, RefreshComponent, HomeComponent, LanguageSelectorComponent],
+  imports: [RouterOutlet, MatToolbarModule, AddressComponent, BackwardComponent, DebugComponent, ForwardComponent, RefreshComponent, HomeComponent, LanguageSelectorComponent, CodeEditComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

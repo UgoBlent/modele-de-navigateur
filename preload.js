@@ -38,4 +38,4 @@ window.electronAPI = {
   getLanguage: () => {
     return localStorage.getItem('selectedLanguage') || 'en';  // Default to 'en' if none is set
   }
-});
+};
