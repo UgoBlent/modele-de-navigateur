@@ -107,6 +107,76 @@ app.whenReady().then(() => {
     }
   });
 
+  ipcMain.handle('get-page-source', async () => {
+    try {
+      const source = await view.webContents.executeJavaScript('document.documentElement.outerHTML');
+      return source;
+    } catch (error) {
+      console.error('Error fetching page source:', error);
+      throw error;
+    }
+  });
+
+  ipcMain.on('open-editor', async () => {
+    if (!editorWindow) {
+      editorWindow = new BrowserWindow({
+        width: 600,
+        height: 400,
+        webPreferences: {
+          nodeIntegration: true,
+          contextIsolation: false
+        }
+      });
+  
+      // Au lieu de charger un fichier, crée une simple interface HTML pour l'éditeur
+      const editorHTML = `
+        <html>
+        <head><title>Code Editor</title></head>
+        <body>
+          <textarea id="editor" style="width:100%; height:80%;"></textarea>
+          <button id="save">Save</button>
+          <script>
+            const { ipcRenderer } = require('electron');
+            ipcRenderer.on('load-source', (event, source) => {
+              document.getElementById('editor').value = source;
+            });
+            document.getElementById('save').addEventListener('click', () => {
+              const updatedSource = document.getElementById('editor').value;
+              ipcRenderer.send('save-source', updatedSource);
+            });
+          </script>
+        </body>
+        </html>
+      `;
+      
+      // Charger directement le contenu HTML dans la nouvelle fenêtre
+      editorWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(editorHTML));
+  
+      // Récupérer le code source de la page
+      const pageSource = await view.webContents.executeJavaScript('document.documentElement.outerHTML');
+  
+      // Envoyer le code source à la fenêtre d'édition lorsqu'elle est prête
+      editorWindow.webContents.once('did-finish-load', () => {
+        editorWindow.webContents.send('load-source', pageSource);
+      });
+  
+      editorWindow.on('closed', () => {
+        editorWindow = null;
+      });
+    } else {
+      editorWindow.focus();  // Si la fenêtre est déjà ouverte
+    }
+  });
+
+  ipcMain.on('save-source', (event, newSource) => {
+    // Appliquer le nouveau code source (attention : peut être risqué et complexe)
+    view.webContents.executeJavaScript(`document.documentElement.innerHTML = ${JSON.stringify(newSource)}`);
+  });
+
+  ipcMain.on('go-home', () => {
+    view.webContents.loadURL('https://amiens.unilasalle.fr');  // URL d'accueil, remplace par l'URL que tu souhaites
+  });
+
   // Handle navigation events
   view.webContents.on('did-start-navigation', (event, url) => {
     win.webContents.send('update-url', url);

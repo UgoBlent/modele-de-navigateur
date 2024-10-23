@@ -20,6 +20,7 @@ window.electronAPI = {
   onDidNavigate: (callback) => ipcRenderer.on('did-navigate', callback),
 
   executeJavaScript: (script) => ipcRenderer.invoke('execute-javascript', script),
+  openEditor: () => ipcRenderer.send('open-editor'),
 
   setLanguage: (language) => {
     localStorage.setItem('selectedLanguage', language);
